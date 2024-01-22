@@ -1,61 +1,50 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import Statistics from 'components/Statistics/Statistics';
 import FeedbackOptions from 'components/FeedbackOptions/FeedbackOptions';
 import Notification from 'components/Notification/Notification';
-import { useState } from 'react';
-import PropTypes from 'prop-types';
 
-const Section = ({title}) => {
-  
-const [good , setGood] = useState(0);
-const [ neutral, setNeutral] = useState(0);
-const [ bad , setBad] = useState(0);
+const Section = ({ title, feedbackOptions, handleFeedback }) => {
+  const countTotalFeedback = () => {
+    return feedbackOptions.good + feedbackOptions.neutral + feedbackOptions.bad;
+  };
 
-const  countTotalFeedback = () => {
-  return bad + good + neutral;
-};
-const  countPositiveFeedbackPercentage = () => {
-  return Math.round((good * 100) / countTotalFeedback());
-};
-function  onLeaveFeedback ( options)  {
-  if(options === 'good'){
-   setGood((prevState => prevState + 1))
-  }
-  if(options === 'neutral'){
-     setNeutral((prevState => prevState + 1))
-  }
-  if(options === 'bad'){
-      setBad((prevState => prevState + 1))
-  }
- console.log(options);
-};
-return (
-  <>
-    <h1>Please leave feedback</h1>
-    <FeedbackOptions
-      options={['good', 'neutral', 'bad']}
-      onLeaveFeedback = {onLeaveFeedback}
-    />
+  const countPositiveFeedbackPercentage = () => {
+    return Math.round((feedbackOptions.good * 100) / countTotalFeedback());
+  };
 
-    <h2>{title}</h2>
-    {countTotalFeedback() === 0 ? (
-      <Notification message="There is no feedback" />
-    ) 
-    : (
-      <Statistics
-        good={good}
-        neutral={neutral}
-        bad={bad}
-        total={countTotalFeedback}
-        positivePercentage={countPositiveFeedbackPercentage}
+  return (
+    <>
+      <h1>Please leave feedback</h1>
+      <FeedbackOptions
+        options={['good', 'neutral', 'bad']}
+        onLeaveFeedback={handleFeedback}
       />
-    )
-    }
-  </>
-)
-}
 
-export default Section;
+      <h2>{title}</h2>
+      {countTotalFeedback() === 0 ? (
+        <Notification message="There is no feedback" />
+      ) : (
+        <Statistics
+          good={feedbackOptions.good}
+          neutral={feedbackOptions.neutral}
+          bad={feedbackOptions.bad}
+          total={countTotalFeedback}
+          positivePercentage={countPositiveFeedbackPercentage}
+        />
+      )}
+    </>
+  );
+};
 
 Section.propTypes = {
-  title: PropTypes.string
+  title: PropTypes.string,
+  feedbackOptions: PropTypes.shape({
+    good: PropTypes.number,
+    neutral: PropTypes.number,
+    bad: PropTypes.number,
+  }).isRequired,
+  handleFeedback: PropTypes.func.isRequired,
 };
+
+export default Section;
